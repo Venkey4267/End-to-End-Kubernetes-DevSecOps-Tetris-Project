@@ -65,7 +65,7 @@ pipeline {
                         withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {   
                             sh 'docker system prune -f'
                             sh 'docker container prune -f'
-                            sh 'docker build -t tetrisv2 .'
+                            sh 'docker build -t tetrisv1 .'
                         }
                     }
                 }
@@ -75,15 +75,15 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {   
-                        sh 'docker tag tetrisv2 sriram8788/tetrisv2:${BUILD_NUMBER}'
-                        sh 'docker push sriram8788/tetrisv2:${BUILD_NUMBER}'
+                        sh 'docker tag tetrisv1 sriram8788/tetrisv1:${BUILD_NUMBER}'
+                        sh 'docker push sriram8788/tetrisv1:${BUILD_NUMBER}'
                     }
                 }
             }
         }
         stage("TRIVY Image Scan") {
             steps {
-                sh 'trivy image sriram8788/tetrisv2:${BUILD_NUMBER} > trivyimage.txt' 
+                sh 'trivy image sriram8788/tetrisv1:${BUILD_NUMBER} > trivyimage.txt' 
             }
         }
         stage('Checkout Code') {
@@ -100,9 +100,9 @@ pipeline {
                             git config user.name "praviteja999"
                             BUILD_NUMBER=${BUILD_NUMBER}
                             echo $BUILD_NUMBER
-                            imageTag=$(grep -oP '(?<=tetrisv2:)[^ ]+' deployment-service.yml)
+                            imageTag=$(grep -oP '(?<=tetrisv1:)[^ ]+' deployment-service.yml)
                             echo $imageTag
-                            sed -i "s/tetrisv2:${imageTag}/tetrisv2:${BUILD_NUMBER}/" deployment-service.yml
+                            sed -i "s/tetrisv1:${imageTag}/tetrisv1:${BUILD_NUMBER}/" deployment-service.yml
                             git add deployment-service.yml
                             git commit -m "Update deployment Image to version \${BUILD_NUMBER}"
 
